@@ -1,157 +1,64 @@
-# Multi-Chain Wallet Generator
+# Wallet Generator
 
-A command-line tool to generate wallets for multiple blockchain networks. Currently supports TON, SUI, Solana, and EVM networks.
-
-## Features
-
-- Generate wallets for multiple blockchain networks:
-  - TON (The Open Network)
-  - SUI (Sui Network)
-  - Solana
-  - EVM (Ethereum Virtual Machine)
-  - IBC (Inter-Blockchain Communication)
-- Bulk wallet generation
-- User-friendly CLI with arrow key navigation
-- Progress indicators and colorful interface
-- Organized output files
-- Secure wallet generation
-
-## Prerequisites
-
-Before running this application, make sure you have the following installed:
-
-- Node.js (v18 or higher)
-- npm (Node Package Manager)
-
-## Installation
-
-1. Clone the repository
-
-```bash
-git clone https://codeberg.org/Galkurta/Wallet-Generator.git
-cd Wallet-Generator
-```
-
-2. Install dependencies
-
-```bash
-npm install
-```
-
-## Usage
-
-1. Start the application
-
-```bash
-npm start
-```
-
-2. Use arrow keys to navigate through the menu
-3. Select the desired blockchain network
-4. Enter the number of wallets to generate
-5. Find the generated wallets in the `output` folder:
-   - `{NETWORK}_wallets_details_{TIMESTAMP}.txt`: Contains complete wallet information
-   - `{NETWORK}_addresses_{TIMESTAMP}.txt`: Contains only wallet addresses
-
-## Project Structure
-
-```
-Wallet-Generator/
-├── package.json
-├── src/
-│   ├── chains/
-│   │   └── ibc/
-│   │       ├── index.js
-│   │       ├── cosmos.js
-│   │       ├── osmosis.js
-│   │       ├── neutron.js
-│   │       ├── celestia.js
-│   │       ├── sei.js
-│   │       ├── stride.js
-│   │       ├── injective.js
-│   │       ├── axelar.js
-│   │       ├── secret.js
-│   │       └── kava.js
-│   ├── constants/
-│   │   └── banner.js
-│   ├── core/
-│   │   └── baseWallet.js
-│   ├── generators/
-│   │   ├── tonWallet.js
-│   │   ├── suiWallet.js
-│   │   ├── solanaWallet.js
-│   │   ├── evmWallet.js
-│   │   └── ibcWallet.js
-│   ├── services/
-│   │   └── walletService.js
-│   └── index.js
-├── output/
-│   └── .gitkeep
-└── README.md
-```
-
-## Dependencies
-
-- `@mysten/sui.js`: SUI blockchain integration
-- `@solana/web3.js`: Solana blockchain integration
-- `bs58`: Base58 encoding/decoding
-- `chalk`: Terminal string styling
-- `ethers`: Ethereum wallet functionality
-- `inquirer`: Interactive command line interface
-- `ora`: Elegant terminal spinners
-- `tonweb`: TON blockchain integration
-- `tonweb-mnemonic`: Mnemonic generation for TON
-
-## Security
-
-**IMPORTANT SECURITY NOTES:**
-
-- Keep your private keys and mnemonics secure
-- Never share your private keys or mnemonic phrases
-- Store generated wallet details in a secure location
-- Use generated wallets at your own risk
-- This tool is for educational purposes only
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-
-```bash
-git checkout -b feature/amazing-feature
-```
-
-3. Commit your changes
-
-```bash
-git commit -m 'Add some amazing feature'
-```
-
-4. Push to the branch
-
-```bash
-git push origin feature/amazing-feature
-```
-
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details
-
-## Acknowledgments
-
-- TON Foundation for TON blockchain integration
-- Sui Foundation for SUI blockchain integration
-- Solana Foundation for Solana blockchain integration
-- Ethereum Foundation for EVM compatibility
-
-## Support
-
-If you find this project helpful, please give it a ⭐️!
+Minimal CLI to generate multi-chain wallets and save them as **plaintext JSON**.  
+No passwords, no keystores, no extra prompts — just standard, compatible keys.
 
 ---
 
-**Note**: This tool is for educational purposes only. Use generated wallets at your own risk.
-# Wallet-Generator
-# Wallet-Generator
+## Features
+- **EVM (Ethereum & L2s)**
+  - BIP-39 mnemonic (24 words)
+  - Derivation path: `m/44'/60'/0'/0/0`
+- **Solana**
+  - BIP-39 + ed25519 HD (SLIP-0010 style)
+  - Derivation path: `m/44'/501'/0'/0'` (Phantom-compatible)
+- **Transparent outputs**
+  - `address`, `publicKey`, `privateKey`, `mnemonic`, `derivationPath`, `bip39Passphrase` (null if unset)
+- **Safer file permissions**
+  - Starts with `umask(0o077)` and tries `chmod 0600` on outputs (best-effort on POSIX)
+
+> Other chains (Cosmos/IBC, Sui, TON) may be present depending on generators in `src/generators/`.
+
+---
+
+## Setup
+$ git clone https://github.com/mirai-web3/Wallet-Generator  
+$ cd Wallet-Generator  
+$ npm install
+
+**Requirements:** Node.js 18+ (ESM), npm or pnpm.
+
+---
+
+## Usage
+Run the CLI and follow the prompt:
+
+$ node src/main.js
+
+Outputs are written to `./output/` as JSON files.
+
+### Optional: BIP-39 passphrase
+Used by BIP-39 generators (e.g., EVM, Solana). Changes derived keys.
+
+macOS/Linux:
+$ export WALLET_BIP39_PASSPHRASE="my-extra-passphrase"
+$ node src/main.js
+
+Windows (PowerShell):
+> setx WALLET_BIP39_PASSPHRASE "my-extra-passphrase"
+(restart terminal), then:
+> node src/main.js
+
+---
+
+## Importing into wallets
+- **EVM:** import by mnemonic (24 words), path `m/44'/60'/0'/0/0`.
+- **Solana:** import by mnemonic, path `m/44'/501'/0'/0'` (Phantom-compatible).
+- For other chains, check the specific generator in `src/generators/`.
+
+---
+
+## Notes
+- Outputs are **plaintext**. Treat `./output/` like a safe; avoid synced/shared folders.
+- On POSIX systems, files default to owner-only; permission tweaks are best-effort on non-POSIX.
+- This tool **only generates** wallets; it does not sign transactions or interact with dapps.
